@@ -1,0 +1,5 @@
+node_modules/
+output/
+public/clips/*.mp4
+public/audio/*
+!public/audio/.gitkeep
