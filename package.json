@@ -1,0 +1,28 @@
+{
+  "name": "video_geissel",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "remotion studio src/index.jsx --host=0.0.0.0",
+    "render": "remotion render src/index.jsx Avaluacio output/avaluacio.mp4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arouissi26-arch/video_geissel.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arouissi26-arch/video_geissel/issues"
+  },
+  "homepage": "https://github.com/arouissi26-arch/video_geissel#readme",
+  "dependencies": {
+    "@remotion/cli": "^4.0.545",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "remotion": "^4.0.545"
+  }
+}
