@@ -1,0 +1,43 @@
+{
+  "name": "video_geissel",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node scripts/prepare.mjs && tsc",
+    "dev": "node scripts/prepare.mjs && vite",
+    "build": "node scripts/prepare.mjs && tsc && vite build",
+    "studio": "node scripts/prepare.mjs && remotion studio src/video/Root.tsx",
+    "render": "node scripts/prepare.mjs && remotion render src/video/Root.tsx Avaluacio out/avaluacio-inicial.mp4 --codec=h264",
+    "render:vertical": "node scripts/prepare.mjs && remotion render src/video/Root.tsx Vertical out/avaluacio-vertical.mp4 --codec=h264",
+    "media": "node scripts/prepare.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arouissi26-arch/video_geissel.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arouissi26-arch/video_geissel/issues"
+  },
+  "homepage": "https://github.com/arouissi26-arch/video_geissel#readme",
+  "dependencies": {
+    "@fontsource/anton": "5.3.0",
+    "@fontsource/space-grotesk": "5.3.0",
+    "@remotion/cli": "4.0.545",
+    "@remotion/player": "4.0.545",
+    "lucide-react": "1.76.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "remotion": "4.0.545"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^7.0.2",
+    "vite": "^6.4.6"
+  }
+}

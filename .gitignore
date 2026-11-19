@@ -1,0 +1,10 @@
+node_modules/
+dist/
+out/
+public/clips/*
+!public/clips/.gitkeep
+public/audio/*
+!public/audio/.gitkeep
+!public/audio/pulse.mp3
+public/fallback/
+src/media.json
