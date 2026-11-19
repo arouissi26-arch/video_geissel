@@ -28,17 +28,7 @@ import "@fontsource/space-grotesk/latin-500.css";
 import "@fontsource/space-grotesk/latin-600.css";
 import "@fontsource/space-grotesk/latin-700.css";
 import { Movie } from "./video/Movie";
-import {
-  defaults,
-  active,
-  clock,
-  colors,
-  scenes,
-  names,
-  questions,
-  BLOCK,
-  TOTAL,
-} from "./data";
+import { defaults, timeline, student, clock, questions } from "./data";
 import "./style.css";
 const pad = (v: number) => String(v).padStart(2, "0");
 function Logo() {
@@ -66,12 +56,17 @@ function App() {
     [props, S] = useState(defaults),
     [err, E] = useState(""),
     [fsErr, FS] = useState("");
-  const index = active(frame);
+  const { scenes, total: TOTAL } = timeline(props.clips);
+  const last = scenes.length - 1;
+  const index = Math.max(
+    0,
+    scenes.findIndex((s) => frame < s.from + s.frames),
+  );
   const urls = useRef<string[]>([]);
   const player = () => ref.current!;
   const seek = (i: number) =>
     player().seekTo(Math.max(0, Math.min(TOTAL - 1, i)));
-  const goto = (i: number) => seek(i * BLOCK);
+  const goto = (i: number) => seek(scenes[i].from);
   const open = () => {
     player().pause();
     D(true);
@@ -107,11 +102,27 @@ function App() {
     }
     const src = URL.createObjectURL(f);
     urls.current.push(src);
-    S((old) =>
-      i < 0
-        ? { ...old, audio: src }
-        : { ...old, clips: old.clips.map((c, n) => (i === n ? src : c)) },
-    );
+    if (i < 0) S((old) => ({ ...old, audio: src }));
+    else {
+      const v = document.createElement("video");
+      v.preload = "metadata";
+      v.onloadedmetadata = () => {
+        if (!Number.isFinite(v.duration) || v.duration <= 0) {
+          E("No es pot llegir la durada del vídeo.");
+          return;
+        }
+        const seconds = v.duration;
+        seek(0);
+        S((old) => ({
+          ...old,
+          clips: old.clips.map((c, n) =>
+            i === n ? { ...c, src, seconds } : c,
+          ),
+        }));
+      };
+      v.onerror = () => E("No es pot obrir el vídeo.");
+      v.src = src;
+    }
     E("");
   };
   const toggle = (e: React.MouseEvent) => player().toggle(e);
@@ -150,7 +161,7 @@ function App() {
               Avaluació inicial<span>.</span>
             </h1>
             <p>
-              Estudi de força <b>·</b> Seqüència d’avaluació física
+              {student} <b>·</b> Avaluació de força
             </p>
           </div>
           <button
@@ -224,7 +235,7 @@ function App() {
                 </button>
                 <button
                   title="Escena següent"
-                  onClick={() => goto(Math.min(10, index + 1))}
+                  onClick={() => goto(Math.min(last, index + 1))}
                 >
                   <SkipForward />
                 </button>
@@ -276,26 +287,26 @@ function App() {
                 <Layers3 />
                 Escenes
               </h2>
-              <span className="pill">11 BLOCS</span>
+              <span className="pill">{scenes.length} BLOCS</span>
             </div>
             <div className="list">
               {scenes.map((s, i) => (
                 <button
-                  key={s}
+                  key={s.name}
                   className={"row " + (i === index ? "selected" : "")}
                   onClick={() => goto(i)}
                 >
-                  <span className="tile" style={{ background: colors[i] }}>
+                  <span className="tile" style={{ background: s.color }}>
                     {i === 0 ? (
                       <Sparkles size={16} />
-                    ) : i === 10 ? (
+                    ) : i === last ? (
                       <Flag size={16} />
                     ) : (
                       pad(i)
                     )}
                   </span>
-                  <strong>{s}</strong>
-                  <small>{clock(i * BLOCK)}</small>
+                  <strong>{s.name}</strong>
+                  <small>{clock(s.from)}</small>
                   {i === index ? (
                     <AudioLines className="activebars" size={13} />
                   ) : (
@@ -308,10 +319,13 @@ function App() {
               <span className="smalldot" />{" "}
               {index === 0
                 ? "INTRO"
-                : index === 10
+                : index === last
                   ? "OUTRO"
                   : `EXERCICI ${pad(index)}`}
-              <span> BLOC {pad(index + 1)} / 11</span>
+              <span>
+                {" "}
+                BLOC {pad(index + 1)} / {scenes.length}
+              </span>
             </div>
           </aside>
         </div>
@@ -322,7 +336,7 @@ function App() {
               Línia de temps
             </h2>
             <div className="tmeta">
-              <Timer size={13} /> 00:52 <i /> 120 BPM
+              <Timer size={13} /> {clock(TOTAL)} <i /> 120 BPM
             </div>
           </div>
           <div className="tracks">
@@ -334,8 +348,10 @@ function App() {
                 seek(Math.round(((e.clientX - r.left) / r.width) * TOTAL));
               }}
             >
-              {[0, 8, 16, 24, 32, 40, 48].map((n) => (
-                <span key={n} style={{ left: `${(n / 52) * 100}%` }}>
+              {Array.from({ length: 7 }, (_, i) =>
+                Math.floor((i * TOTAL) / 7 / 30),
+              ).map((n) => (
+                <span key={n} style={{ left: `${((n * 30) / TOTAL) * 100}%` }}>
                   {clock(n * 30)}
                 </span>
               ))}
@@ -346,13 +362,13 @@ function App() {
             <div className="strip">
               {scenes.map((s, i) => (
                 <button
-                  title={s}
-                  key={s}
-                  style={{ background: colors[i], flex: i === 10 ? 3 : 1 }}
+                  title={s.name}
+                  key={s.name}
+                  style={{ background: s.color, flex: s.frames }}
                   className={index === i ? "clip sel" : "clip"}
                   onClick={() => goto(i)}
                 >
-                  {i === 0 ? "INTRO" : i === 10 ? "OUTRO" : pad(i)}
+                  {i === 0 ? "INTRO" : i === last ? "OUTRO" : pad(i)}
                 </button>
               ))}
               <div
@@ -422,22 +438,21 @@ function App() {
               <p>
                 Per al render, desa els MP4 a <code>public/clips/</code>.
               </p>
-              {names.map((name, i) => (
-                <label className="fileline" key={name}>
-                  {defaults.clips[i] &&
-                    !props.clips[i]?.startsWith("blob:") && (
-                      <img
-                        alt=""
-                        width="52"
-                        height="32"
-                        src={`/thumbs/${i + 1}.jpg`}
-                      />
-                    )}
+              {props.clips.map(({ slot, src }, i) => (
+                <label className="fileline" key={slot}>
+                  {!src.startsWith("blob:") && (
+                    <img
+                      alt=""
+                      width="52"
+                      height="32"
+                      src={`/thumbs/${slot}.jpg`}
+                    />
+                  )}
                   <strong>
-                    {pad(i + 1)} · {name}
-                    <small>exercici-{i + 1}.mp4</small>
+                    {pad(i + 1)} · {scenes[i + 1].name}
+                    <small>exercici-{slot}.mp4</small>
                   </strong>
-                  <span>{props.clips[i] ? "Disponible" : "Pendent"}</span>
+                  <span>{clock(Math.ceil(props.clips[i].seconds * 30))}</span>
                   <Upload size={17} />
                   <input
                     type="file"
@@ -473,7 +488,7 @@ function App() {
               <label className="answer" key={q}>
                 {q}
                 <input
-                  maxLength={95}
+                  maxLength={180}
                   value={props.answers[i]}
                   onChange={(e) =>
                     S({

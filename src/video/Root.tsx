@@ -1,7 +1,7 @@
 import React from "react";
 import { Composition, registerRoot } from "remotion";
 import { Movie } from "./Movie";
-import { defaults, FPS, TOTAL } from "../data";
+import { defaults, FPS, timeline } from "../data";
 import "@fontsource/space-grotesk/latin-700.css";
 const Root = () => (
   <>
@@ -13,7 +13,10 @@ const Root = () => (
         width={tall ? 1080 : 1920}
         height={tall ? 1920 : 1080}
         fps={FPS}
-        durationInFrames={TOTAL}
+        durationInFrames={timeline(defaults.clips).total}
+        calculateMetadata={({ props }) => ({
+          durationInFrames: timeline(props.clips).total,
+        })}
         defaultProps={defaults}
       />
     ))}

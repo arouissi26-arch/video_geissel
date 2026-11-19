@@ -1,5 +1,5 @@
 import React from "react";
-import { Grade } from "./Look";
+
 import {
   AbsoluteFill,
   Audio,
@@ -15,7 +15,15 @@ import {
   Easing,
 } from "remotion";
 import "@fontsource/anton/latin-400.css";
-import { BLOCK, TOTAL, MovieProps, names, colors, questions } from "../data";
+import {
+  INTRO,
+  CARD,
+  student,
+  timeline,
+  MovieProps,
+  colors,
+  questions,
+} from "../data";
 const mono = '"Courier New", monospace',
   lime = "#e2fb44",
   display = "Anton, sans-serif";
@@ -209,142 +217,93 @@ export function Intro() {
               "repeating-linear-gradient(90deg,#19161c 0 4px,transparent 4px 9px,#19161c 9px 11px,transparent 11px 16px)",
           }}
         />{" "}
-        EDUCACIÓ FÍSICA
+        {student} · EDUCACIÓ FÍSICA
       </div>
     </AbsoluteFill>
   );
 }
+// The title animates in its own band; not one frame of the recording is
+// hidden by a transition, an overlay, a zoom or a crop.
 export function Ejercicio({
   numero,
   nombre,
   clip,
   colorAccent,
+  count,
+  frames,
 }: {
   numero: number;
   nombre: string;
-  clip: string | null;
+  clip: string;
   colorAccent: string;
+  count: number;
+  frames: number;
 }) {
   const f = useCurrentFrame(),
     { width, height } = useVideoConfig(),
-    p = 1 - val(f, 0, 15, 0, 1),
-    k = pop(f, 3),
     tall = height > width;
-  const trans: React.CSSProperties[] = [
-    { transform: `translateX(${p * 85}%) skewX(${-p * 12}deg)` },
-    { transform: `scale(${1 + p * 1.4})` },
-    { transform: `translateY(${-p * 90}%)`, filter: `blur(${p * 14}px)` },
-    {
-      clipPath: `polygon(0 0,${140 - p * 140}% 0,${100 - p * 140}% 100%,0 100%)`,
-    },
-    { clipPath: `inset(${p * 50}% 0)` },
-    { transform: `rotate(${p * 12}deg) scale(${1 + p * 0.7})` },
-    { clipPath: `circle(${(1 - p) * 130}% at 80% 20%)` },
-    { transform: `translateX(${-p * 95}%)`, filter: `blur(${p * 20}px)` },
-    {
-      clipPath: `inset(0 ${p * 100}% 0 0)`,
-      transform: `scale(${1 + p * 0.4})`,
-    },
-  ];
   return (
-    <AbsoluteFill style={{ background: colorAccent, overflow: "hidden" }}>
-      <AbsoluteFill
+    <AbsoluteFill style={{ background: "#19191b" }}>
+      <OffthreadVideo
+        src={asset(clip)}
+        volume={0.85}
+        style={{ width: "100%", height: "91.5%", objectFit: "contain" }}
+      />
+      <div
         style={{
-          ...trans[numero - 1],
-          background: clip ? "#222" : colorAccent,
+          position: "absolute",
+          bottom: 0,
+          height: "8.5%",
+          left: 0,
+          right: 0,
+          display: "flex",
+          alignItems: "center",
+          padding: "0 4%",
+          gap: 28,
+          color: "white",
+          fontFamily: display,
         }}
       >
-        <Grade id={`moody-${numero}`} />
-        {clip ? (
-          <OffthreadVideo
-            src={asset(clip)}
-            muted
-            style={{
-              height: "100%",
-              width: "100%",
-              objectFit: tall ? "contain" : "cover",
-              filter: `url(#moody-${numero}) contrast(1.05)`,
-              transform: `scale(${1 + val(f, 0, BLOCK, 0, 0.045)})`,
-            }}
-          />
-        ) : (
-          <AbsoluteFill
-            style={{
-              background: `repeating-linear-gradient(${35 + f * 0.05}deg,transparent 0 68px,#18181818 68px 74px)`,
-              alignItems: "center",
-              justifyContent: "center",
-              font: `${width * 0.25}px ${display}`,
-              color: "#0002",
-            }}
-          >
-            {num(numero)}
-          </AbsoluteFill>
-        )}
-        <AbsoluteFill
+        <span
           style={{
-            background:
-              "radial-gradient(ellipse at center,transparent 40%,#17101855),linear-gradient(0deg,#141016a6,transparent 60%)",
+            fontSize: tall ? 55 : 40,
+            background: colorAccent,
+            color: "#171518",
+            padding: "0 13px",
+            transform: `scale(${0.8 + 0.2 * pop(f)}) rotate(-3deg)`,
+          }}
+        >
+          {num(numero)}
+        </span>
+        <span
+          style={{
+            fontSize: tall ? 54 : 40,
+            textTransform: "uppercase",
+            transform: `translateX(${(1 - pop(f)) * 45}px)`,
+          }}
+        >
+          {nombre}
+        </span>
+        <span
+          style={{
+            marginLeft: "auto",
+            font: `bold ${width * 0.014}px ${mono}`,
+            letterSpacing: 2,
+          }}
+        >
+          FORÇA / {num(numero)} DE {num(count)}
+        </span>
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            top: 0,
+            height: 4,
+            width: `${(100 * (f + 1)) / frames}%`,
+            background: colorAccent,
           }}
         />
-        <Dust />
-        <div style={{ position: "absolute", top: "7%", left: "5%", ...tag }}>
-          EXERCICI {num(numero)} / 09
-        </div>
-        <div
-          style={{
-            position: "absolute",
-            top: "8%",
-            right: "5%",
-            width: "25%",
-            height: 10,
-            background: "#ffffff55",
-          }}
-        >
-          <div
-            style={{
-              height: "100%",
-              width: `${((numero - 1 + f / BLOCK) / 9) * 100}%`,
-              background: colorAccent,
-            }}
-          />
-        </div>
-        <div
-          style={{
-            position: "absolute",
-            bottom: "10%",
-            left: "5%",
-            color: "#fff",
-            fontFamily: display,
-          }}
-        >
-          <div
-            style={{
-              fontSize: width * 0.115,
-              lineHeight: 1.1,
-              transformOrigin: "left bottom",
-              transform: `scale(${0.5 + k * 0.5}) rotate(${(1 - k) * -14}deg)`,
-            }}
-          >
-            {num(numero)}
-          </div>
-          <div
-            style={{
-              fontSize: width * (tall ? 0.095 : 0.059),
-              background: colorAccent,
-              color: "#171619",
-              padding: "0 28px 9px",
-              textTransform: "uppercase",
-              transform: `translateX(${(1 - pop(f, 6)) * -450}px) rotate(-2deg)`,
-            }}
-          >
-            {nombre}
-          </div>
-          {!clip && <span style={{ ...tag, marginTop: 20 }}>CLIP PENDENT</span>}
-        </div>
-      </AbsoluteFill>
-      <AbsoluteFill
-        style={{ background: "#fff", opacity: val(f, 0, 4, 0.42, 0) }}
-      />
+      </div>
     </AbsoluteFill>
   );
 }
@@ -355,9 +314,20 @@ export function Outro({ index, answer }: { index: number; answer: string }) {
     <AbsoluteFill
       style={{ background: "#222028", overflow: "hidden", color: "#fff" }}
     >
+      <Img
+        src={staticFile(`art/${["stance", "grip", "runner"][index]}.jpg`)}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          objectPosition: "65% center",
+          transform: `scale(${1 + val(f, 0, CARD, 0, 0.04)})`,
+        }}
+      />
       <AbsoluteFill
         style={{
-          background: `radial-gradient(ellipse at ${25 + f * 0.4}% 100%,#8963a9,transparent 60%)`,
+          background:
+            "linear-gradient(90deg,#19141fee 12%,#19141fdf 49%,#19141f12 100%)",
         }}
       />
       <Dust />
@@ -378,8 +348,8 @@ export function Outro({ index, answer }: { index: number; answer: string }) {
         <div
           style={{
             marginTop: 65,
-            maxWidth: "92%",
-            font: `${width * 0.059}px/1.12 ${display}`,
+            maxWidth: "75%",
+            font: `${width * 0.048}px/1.12 ${display}`,
             textTransform: "uppercase",
           }}
         >
@@ -399,7 +369,9 @@ export function Outro({ index, answer }: { index: number; answer: string }) {
         </div>
         <p
           style={{
-            font: `bold ${width * 0.044}px "Space Grotesk"`,
+            maxWidth: "70%",
+            lineHeight: 1.2,
+            font: `bold ${width * 0.032}px "Space Grotesk"`,
             color: lime,
             opacity: val(f, 19, 32, 0, 1),
           }}
@@ -412,11 +384,16 @@ export function Outro({ index, answer }: { index: number; answer: string }) {
           <AbsoluteFill
             style={{
               background: "#faf1ff",
-              opacity: val(f, 93, 98, 0, 0.22) * val(f, 98, 103, 1, 0),
+              opacity:
+                val(f, CARD - 27, CARD - 22, 0, 0.22) *
+                val(f, CARD - 22, CARD - 17, 1, 0),
             }}
           />
           <AbsoluteFill
-            style={{ background: "black", opacity: val(f, 98, 118, 0, 1) }}
+            style={{
+              background: "black",
+              opacity: val(f, CARD - 22, CARD - 2, 0, 1),
+            }}
           />
         </>
       )}
@@ -424,28 +401,35 @@ export function Outro({ index, answer }: { index: number; answer: string }) {
   );
 }
 export function Movie({ clips, answers, audio }: MovieProps) {
+  const { exercises, outro, total } = timeline(clips);
   return (
     <AbsoluteFill style={{ background: "#141416" }}>
       <Audio
         src={asset(audio)}
         loop
-        volume={(f) => 0.78 * val(f, TOTAL - 65, TOTAL - 1, 1, 0)}
+        loopVolumeCurveBehavior="extend"
+        volume={(f) =>
+          (f >= INTRO && f < outro ? 0.14 : 0.6) *
+          val(f, total - 65, total - 1, 1, 0)
+        }
       />
-      <Sequence durationInFrames={BLOCK}>
+      <Sequence durationInFrames={INTRO}>
         <Intro />
       </Sequence>
-      {names.map((name, i) => (
+      {exercises.map((e, i) => (
         <Sequence
-          key={name}
-          name={name}
-          from={(i + 1) * BLOCK}
-          durationInFrames={BLOCK}
+          key={e.slot}
+          name={e.name}
+          from={e.from}
+          durationInFrames={e.frames}
         >
           <Ejercicio
             numero={i + 1}
-            nombre={name}
-            clip={clips[i]}
-            colorAccent={colors[i + 1]}
+            nombre={e.name}
+            clip={e.src}
+            frames={e.frames}
+            count={exercises.length}
+            colorAccent={colors[e.slot]}
           />
         </Sequence>
       ))}
@@ -453,8 +437,8 @@ export function Movie({ clips, answers, audio }: MovieProps) {
         <Sequence
           key={q}
           name={q}
-          from={(10 + i) * BLOCK}
-          durationInFrames={BLOCK}
+          from={outro + i * CARD}
+          durationInFrames={CARD}
         >
           <Outro index={i} answer={answers[i]} />
         </Sequence>

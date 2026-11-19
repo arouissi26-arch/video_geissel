@@ -15,10 +15,16 @@ export const questions = [
   "El moviment que més necessito millorar és:",
   "Objectiu personal per al final del curs:",
 ];
-export const answers = ["[Resposta]", "[Resposta]", "[Resposta]"];
+export const student = "Geissel Canelas";
+// Propuesta de autoevaluación; editable antes de entregar.
+export const answers = [
+  "Em sento més segura en les sentadilles: puc controlar la baixada i tornar a pujar sense perdre l’equilibri.",
+  "Vull millorar les dominades, sobretot l’inici de la pujada, sense agafar impuls amb les cames.",
+  "A final de curs vull fer una dominada completa i controlada. Gravaré el moviment per comparar-lo amb el d’avui.",
+];
 export const FPS = 30,
-  BLOCK = 120,
-  TOTAL = BLOCK * 13;
+  INTRO = 4 * FPS,
+  CARD = 8 * FPS;
 export const colors = [
   "#bfa5ed",
   "#e5ec68",
@@ -32,13 +38,32 @@ export const colors = [
   "#d8e878",
   "#b79ddd",
 ];
-export const scenes = ["Introducció", ...names, "Reflexió final"];
-export const active = (f: number) => Math.min(10, Math.floor(f / BLOCK));
 export const clock = (f: number) =>
   `${String(Math.floor(f / 1800)).padStart(2, "0")}:${String(Math.floor(f / 30) % 60).padStart(2, "0")}`;
-export const defaults = {
-  clips: media.clips as (string | null)[],
-  audio: media.audio,
-  answers,
-};
+export const defaults = { clips: media.clips, audio: media.audio, answers };
 export type MovieProps = typeof defaults;
+export function timeline(clips: MovieProps["clips"]) {
+  let pos = INTRO;
+  const exercises = clips.map((c) => {
+    const from = pos,
+      frames = Math.ceil(c.seconds * FPS);
+    pos += frames;
+    return { ...c, name: names[c.slot - 1], from, frames };
+  });
+  const scenes = [
+    { name: "Introducció", from: 0, frames: INTRO, color: colors[0] },
+    ...exercises.map((e) => ({ ...e, color: colors[e.slot] })),
+    {
+      name: "Reflexió final",
+      from: pos,
+      frames: questions.length * CARD,
+      color: colors[10],
+    },
+  ];
+  return {
+    exercises,
+    scenes,
+    outro: pos,
+    total: pos + questions.length * CARD,
+  };
+}

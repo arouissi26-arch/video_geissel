@@ -32,61 +32,68 @@ const originals = [
 ];
 fs.mkdirSync("public/fallback", { recursive: true });
 fs.mkdirSync("public/thumbs", { recursive: true });
-const clips = originals.map((name, i) => {
+const ffprobe =
+  process.env.FFPROBE_BIN || ff.replace(/ffmpeg(?=(\.exe)?$)/, "ffprobe");
+const clips = originals.flatMap((name, i) => {
   const uploaded = `clips/exercici-${i + 1}.mp4`,
-    fallback = `fallback/${i + 1}.mp4`;
-  let src = null;
-  if (fs.existsSync(`public/${uploaded}`)) src = uploaded;
-  else if (name && fs.existsSync(`videos/${name}.mp4`)) {
-    if (!fs.existsSync(`public/${fallback}`))
-      execFileSync(ff, [
-        "-loglevel",
-        "error",
-        "-ss",
-        "1",
-        "-i",
-        `videos/${name}.mp4`,
-        "-t",
-        "4",
-        "-an",
-        "-r",
-        "30",
-        "-c:v",
-        "libx264",
-        "-threads",
-        "3",
-        "-preset",
-        "veryfast",
-        "-crf",
-        "22",
-        "-pix_fmt",
-        "yuv420p",
-        "-movflags",
-        "+faststart",
-        `public/${fallback}`,
-      ]);
-    src = fallback;
-  }
-  if (src) {
-    const thumb = `public/thumbs/${i + 1}.jpg`;
+    original = `videos/${name}.mp4`;
+  let src = uploaded;
+  if (!fs.existsSync(`public/${src}`)) {
+    if (!name || !fs.existsSync(original)) return [];
+    src = `fallback/original-${i + 1}.mp4`;
+    const dest = `public/${src}`;
     if (
-      !fs.existsSync(thumb) ||
-      fs.statSync(thumb).mtimeMs < fs.statSync(`public/${src}`).mtimeMs
-    )
-      execFileSync(ff, [
-        "-y",
-        "-loglevel",
-        "error",
-        "-i",
-        `public/${src}`,
-        "-frames:v",
-        "1",
-        "-vf",
-        "scale=240:-2",
-        thumb,
-      ]);
+      !fs.existsSync(dest) ||
+      fs.statSync(original).mtimeMs > fs.statSync(dest).mtimeMs ||
+      fs.statSync(original).size !== fs.statSync(dest).size
+    ) {
+      fs.rmSync(dest, { force: true });
+      try {
+        fs.linkSync(original, dest);
+      } catch {
+        fs.copyFileSync(original, dest);
+      }
+    }
   }
-  return src;
+  const duration = Number(
+    execFileSync(
+      ffprobe,
+      [
+        "-v",
+        "error",
+        "-select_streams",
+        "v:0",
+        "-show_entries",
+        "stream=duration",
+        "-of",
+        "csv=p=0",
+        `public/${src}`,
+      ],
+      { encoding: "utf8" },
+    )
+      .trim()
+      .split(",")[0],
+  );
+  if (!Number.isFinite(duration) || duration <= 0)
+    throw new Error(`Duración de vídeo desconocida: ${src}`);
+  const thumb = `public/thumbs/${i + 1}.jpg`;
+  if (
+    !fs.existsSync(thumb) ||
+    fs.statSync(thumb).mtimeMs < fs.statSync(`public/${src}`).mtimeMs
+  )
+    execFileSync(ff, [
+      "-y",
+      "-loglevel",
+      "error",
+      "-i",
+      `public/${src}`,
+      "-frames:v",
+      "1",
+      "-vf",
+      "scale=240:-2",
+      thumb,
+    ]);
+  return [{ slot: i + 1, src, seconds: duration }];
 });
 const audio = ["music.mp3", "music.wav", "music.m4a", "pulse.mp3"].find((x) =>
   fs.existsSync(path.join("public/audio", x)),
