@@ -1,0 +1,5 @@
+node_modules/
+out/
+public/audio/demo-bed.wav
+/public/clips/*.mp4
+.DS_Store

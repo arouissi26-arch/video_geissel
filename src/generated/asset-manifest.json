@@ -1,0 +1,50 @@
+{
+  "clips": [
+    {
+      "filename": "exercici-1.mp4",
+      "path": "clips/exercici-1.mp4",
+      "available": true
+    },
+    {
+      "filename": "exercici-2.mp4",
+      "path": "clips/exercici-2.mp4",
+      "available": true
+    },
+    {
+      "filename": "exercici-3.mp4",
+      "path": "clips/exercici-3.mp4",
+      "available": true
+    },
+    {
+      "filename": "exercici-4.mp4",
+      "path": "clips/exercici-4.mp4",
+      "available": false
+    },
+    {
+      "filename": "exercici-5.mp4",
+      "path": "clips/exercici-5.mp4",
+      "available": true
+    },
+    {
+      "filename": "exercici-6.mp4",
+      "path": "clips/exercici-6.mp4",
+      "available": false
+    },
+    {
+      "filename": "exercici-7.mp4",
+      "path": "clips/exercici-7.mp4",
+      "available": true
+    },
+    {
+      "filename": "exercici-8.mp4",
+      "path": "clips/exercici-8.mp4",
+      "available": true
+    },
+    {
+      "filename": "exercici-9.mp4",
+      "path": "clips/exercici-9.mp4",
+      "available": false
+    }
+  ],
+  "audio": "audio/demo-bed.wav"
+}
