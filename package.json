@@ -10,7 +10,11 @@
     "studio": "node scripts/prepare.mjs && remotion studio src/video/Root.tsx",
     "render": "node scripts/prepare.mjs && remotion render src/video/Root.tsx Avaluacio out/avaluacio-inicial.mp4 --codec=h264",
     "render:vertical": "node scripts/prepare.mjs && remotion render src/video/Root.tsx Vertical out/avaluacio-vertical.mp4 --codec=h264",
-    "media": "node scripts/prepare.mjs"
+    "media": "node scripts/prepare.mjs",
+    "aissa:media": "node scripts/prepare-aissa.mjs",
+    "aissa:render": "node scripts/prepare.mjs && node scripts/prepare-aissa.mjs && remotion render src/video/Root.tsx Aissa entrega/Aissa-Avaluacio-Inicial.mp4 --codec=h264 --video-bitrate=2400k --audio-bitrate=128k --x264-preset=veryfast --concurrency=2 --offthreadvideo-threads=2",
+    "aissa:test": "tsx scripts/test-aissa.ts",
+    "aissa:studio": "node scripts/prepare.mjs && node scripts/prepare-aissa.mjs && remotion studio src/video/Root.tsx"
   },
   "repository": {
     "type": "git",
@@ -37,6 +41,7 @@
     "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite": "^6.4.6"
   }

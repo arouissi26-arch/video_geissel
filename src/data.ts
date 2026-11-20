@@ -24,6 +24,7 @@ export const answers = [
 ];
 export const FPS = 30,
   INTRO = 4 * FPS,
+  TEASER = 75,
   CARD = 8 * FPS;
 export const colors = [
   "#bfa5ed",
@@ -43,7 +44,13 @@ export const clock = (f: number) =>
 export const defaults = { clips: media.clips, audio: media.audio, answers };
 export type MovieProps = typeof defaults;
 export function timeline(clips: MovieProps["clips"]) {
-  let pos = INTRO;
+  const previews = clips.map((c, i) => ({
+    ...c,
+    name: names[c.slot - 1],
+    from: INTRO + i * TEASER,
+    frames: TEASER,
+  }));
+  let pos = INTRO + previews.length * TEASER;
   const exercises = clips.map((c) => {
     const from = pos,
       frames = Math.ceil(c.seconds * FPS);
@@ -52,6 +59,11 @@ export function timeline(clips: MovieProps["clips"]) {
   });
   const scenes = [
     { name: "Introducció", from: 0, frames: INTRO, color: colors[0] },
+    ...previews.map((e) => ({
+      ...e,
+      name: `Avanç · ${e.name}`,
+      color: colors[e.slot],
+    })),
     ...exercises.map((e) => ({ ...e, color: colors[e.slot] })),
     {
       name: "Reflexió final",
@@ -61,6 +73,7 @@ export function timeline(clips: MovieProps["clips"]) {
     },
   ];
   return {
+    previews,
     exercises,
     scenes,
     outro: pos,

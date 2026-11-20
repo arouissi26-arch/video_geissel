@@ -11,3 +11,8 @@ src/media.json
 
 # Local video deliverable; keep exports out of source control.
 entrega/*.mp4
+
+# Aissa originals already hosted on main; local media staging and generated manifest.
+/videos_aissa/
+/public/aissa/
+!public/audio/aissa-drive.mp3

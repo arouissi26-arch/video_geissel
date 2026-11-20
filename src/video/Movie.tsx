@@ -17,6 +17,7 @@ import {
 import "@fontsource/anton/latin-400.css";
 import {
   INTRO,
+  TEASER,
   CARD,
   student,
   timeline,
@@ -222,6 +223,109 @@ export function Intro() {
     </AbsoluteFill>
   );
 }
+// AI artwork is clearly labelled and kept separate from the real assessment.
+export function Preview({
+  slot,
+  name,
+  clip,
+  numero,
+}: {
+  slot: number;
+  name: string;
+  clip: string;
+  numero: number;
+}) {
+  const f = useCurrentFrame();
+  const accent = colors[slot];
+  return (
+    <AbsoluteFill
+      style={{ background: "#19171e", overflow: "hidden", color: "white" }}
+    >
+      <Img
+        src={staticFile(`art/exercise-${slot}.jpg`)}
+        style={{
+          position: "absolute",
+          width: "44%",
+          height: "100%",
+          objectFit: "cover",
+          transform: `scale(${1.03 + f * 0.0008}) translateX(${(1 - pop(f)) * -30}px)`,
+        }}
+      />
+      <OffthreadVideo
+        src={asset(clip)}
+        startFrom={Math.round(3 * 30)}
+        muted
+        style={{
+          position: "absolute",
+          right: 0,
+          top: "9%",
+          width: "56%",
+          height: "74%",
+          objectFit: "contain",
+          transform: `translateX(${(1 - pop(f, 3)) * 90}px)`,
+        }}
+      />
+      <Dust />
+      <div
+        style={{
+          position: "absolute",
+          top: "6%",
+          left: "4%",
+          ...tag,
+          color: accent,
+        }}
+      >
+        AVANÇ / {num(numero)}
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          bottom: "23%",
+          left: "3%",
+          font: `bold 16px ${mono}`,
+          background: "#19171bcc",
+          padding: 10,
+        }}
+      >
+        IMATGE IA · IL·LUSTRACIÓ
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: "20%",
+          background: accent,
+          color: "#19171e",
+          display: "flex",
+          alignItems: "center",
+          padding: "0 4%",
+          gap: 35,
+          transform: `translateY(${(1 - pop(f, 5)) * 120}px)`,
+        }}
+      >
+        <span style={{ font: `100px ${display}` }}>{num(numero)}</span>
+        <span style={{ font: `78px ${display}`, textTransform: "uppercase" }}>
+          {name}
+        </span>
+        <span style={{ marginLeft: "auto", font: `bold 20px ${mono}` }}>
+          GEISSEL CANELAS
+        </span>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          height: 7,
+          width: `${(100 * (f + 1)) / TEASER}%`,
+          background: "#19171e",
+        }}
+      />
+    </AbsoluteFill>
+  );
+}
 // The title animates in its own band; not one frame of the recording is
 // hidden by a transition, an overlay, a zoom or a crop.
 export function Ejercicio({
@@ -401,7 +505,7 @@ export function Outro({ index, answer }: { index: number; answer: string }) {
   );
 }
 export function Movie({ clips, answers, audio }: MovieProps) {
-  const { exercises, outro, total } = timeline(clips);
+  const { previews, exercises, outro, total } = timeline(clips);
   return (
     <AbsoluteFill style={{ background: "#141416" }}>
       <Audio
@@ -416,6 +520,16 @@ export function Movie({ clips, answers, audio }: MovieProps) {
       <Sequence durationInFrames={INTRO}>
         <Intro />
       </Sequence>
+      {previews.map((e, i) => (
+        <Sequence
+          key={`preview-${e.slot}`}
+          name={`Avanç · ${e.name}`}
+          from={e.from}
+          durationInFrames={TEASER}
+        >
+          <Preview slot={e.slot} name={e.name} clip={e.src} numero={i + 1} />
+        </Sequence>
+      ))}
       {exercises.map((e, i) => (
         <Sequence
           key={e.slot}

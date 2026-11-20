@@ -1,0 +1,60 @@
+{
+  "clips": [
+    {
+      "id": "squat",
+      "src": "aissa/squat.mp4",
+      "seconds": 31.359,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "id": "lunge",
+      "src": "aissa/lunge.mp4",
+      "seconds": 19.1,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "id": "bridge",
+      "src": "aissa/bridge.mp4",
+      "seconds": 21.6,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "id": "lumbar",
+      "src": "aissa/lumbar.mp4",
+      "seconds": 19.699,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "id": "abs",
+      "src": "aissa/abs.mp4",
+      "seconds": 39.4,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "id": "plank",
+      "src": "aissa/planxa.mp4",
+      "seconds": 60.56,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "id": "pullup",
+      "src": "aissa/pullup.mp4",
+      "seconds": 17.052,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "id": "pushup",
+      "src": "aissa/pushup.mp4",
+      "seconds": 29.366,
+      "width": 1920,
+      "height": 1080
+    }
+  ]
+}
