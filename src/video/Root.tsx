@@ -3,8 +3,18 @@ import { Composition, registerRoot } from "remotion";
 import { Movie } from "./Movie";
 import { defaults, FPS, timeline } from "../data";
 import "@fontsource/space-grotesk/latin-700.css";
+import { AissaMovie } from "./Aissa";
+import { AFPS, aissaTimeline } from "../aissa-data";
 const Root = () => (
   <>
+    <Composition
+      id="Aissa"
+      component={AissaMovie}
+      width={1920}
+      height={1080}
+      fps={AFPS}
+      durationInFrames={aissaTimeline().total}
+    />
     {[false, true].map((tall) => (
       <Composition
         key={String(tall)}
